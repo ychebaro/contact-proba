@@ -4,7 +4,7 @@ Calculate contact probabilities
 Calculate contact probabilities between two chains in a trajectory (dcd or pdb format) or a single pdb file.
 For using multiple frame pdb trajectories, the format is similar to that of multiple model NMR file.
 Distances are calculated between calpha (default) or heavy atoms, with a user-defined
-cutoff. 
+cutoff. A contact is considered to be formed if at least one heavy atoms between the two chains lies under the specified distance cutoff.
 Pymol scripts can be generated where bonds are created between residues (-visu), according to probability intervals
 (0-0.25,0.25-0.5,0.5-0.75,0.75-1). Use the run option in pymol to execute the scripts. If you have a single pdb
 file you would like to use for the visualization, you can specify it in the -pdbvisu option, otherwise the 
