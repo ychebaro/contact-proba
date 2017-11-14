@@ -67,6 +67,14 @@ create pymol visualization scripts and use the file forpymol.pdb for the scripts
 ./contacts.py -p structurefile.pdb -d twoframes.pdb -c1 A -c2 B -co 3.5 -visu Y -s heavy -pdbvisu forpymol.pdb
  
 
+## Plotting with the script plot-contacts.py
+If you want to plot the matrix, you can use the script plot-contacts.py (an example of plot is present in the example folder).
+For this the arguments needed are of course the matrix and also the pdb file, the script will extract sequence residue name and number for labelling each axis. You can also transpose the matrix if you prefer it this way (the two possibilities are in the example folder).
+Example:
+Plotting with the transpose option
+./plot-contacts.py -m matrix.csv -p forpymol.pdb -c1 A -c2 B -d1 4 -d2 4 -t Y
+
+
 ## TODO :
 - add options for protein-DNA, DNA-DNA contacts
 
