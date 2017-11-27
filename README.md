@@ -79,6 +79,10 @@ Example:
 Plotting with the transpose option
 ./plot-contacts.py -m matrix.csv -p forpymol.pdb -c1 A -c2 B -d1 4 -d2 4 -t Y
 
+## Additional tool
+If you need to change the name of a chain to another (for instance for making all protein chains into one chain id, if you need to calculate protein dna contacts this could be useful), use the script renumber.psf.
+
+
 
 Enjoy! 
 Contact: yasmine.chebaro@gmail.com
