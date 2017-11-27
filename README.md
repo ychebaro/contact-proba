@@ -25,32 +25,27 @@ usage: contacts-version2.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
                             [-o OUTPUT_FILE] [-visu PYMOL]
                             [-pdbvisu PYMOL_PDB]
                             
-    -h, --help            show this help message and exit
-  -p PSF_FILE, --psf PSF_FILE
+-h, --help            show this help message and exit
+-p PSF_FILE, --psf PSF_FILE
                         topology file used for simulation (pdb, psf)
-  -d DCD_FILE, --dcd DCD_FILE
+-d DCD_FILE, --dcd DCD_FILE
                         trajectory (dcd or pdb) or single frame in pdb format
-  -c1 SEGID1, --chain1 SEGID1
+-c1 SEGID1, --chain1 SEGID1
                         segid of first chain for contact calculations
-  -c2 SEGID2, --chain2 SEGID2
-                        segid of second chain for contact calculations
-                        (similar as c1 if intrachain contacts needed)
-  -s1 SELECTION1, --selection1 SELECTION1
-                        atom selection for chain 1 (default is all heavy
-                        atoms)
-  -s2 SELECTION2, --selection2 SELECTION2
-                        atom selection for chain 2 (default is all heavy
-                        atoms)
-  -co CUTOFF, --cutoff CUTOFF
+-c2 SEGID2, --chain2 SEGID2
+                        segid of second chain for contact calculations (similar as c1 if intrachain contacts needed)
+-s1 SELECTION1, --selection1 SELECTION1
+                        atom selection for chain 1 (default is all heavy atoms)
+-s2 SELECTION2, --selection2 SELECTION2
+                        atom selection for chain 2 (default is all heavy atoms)
+-co CUTOFF, --cutoff CUTOFF
                         distance cutoff
-  -o OUTPUT_FILE, --output OUTPUT_FILE
+-o OUTPUT_FILE, --output OUTPUT_FILE
                         name of output file for contact probability
-  -visu PYMOL, --pymolvisu PYMOL
+-visu PYMOL, --pymolvisu PYMOL
                         pymol files for visualization [Y/N]
-  -pdbvisu PYMOL_PDB, --pymol_pdb PYMOL_PDB
-                        If you want the pymol scripts to visualize your
-                        results on the pdb structure, choose a name for a pdb
-                        file otherwise it will just create one :-)
+-pdbvisu PYMOL_PDB, --pymol_pdb PYMOL_PDB
+                        If you want the pymol scripts to visualize your results on the pdb structure, choose a name for a pdb file otherwise it will just create one :-)
                           
 
 * outputs:
