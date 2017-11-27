@@ -1,12 +1,11 @@
 # contact-proba
 Calculate contact probabilities
 
-Calculate contact probabilities between two chains in a trajectory (dcd or pdb format) or a single pdb file.
-For using multiple frame pdb trajectories, the format is similar to that of multiple model NMR file.
-Distances are calculated between calpha (default) or heavy atoms, with a user-defined
-cutoff. A contact is considered to be formed if at least one heavy atoms between the two chains lies under the specified distance cutoff.
-Pymol scripts can be generated where bonds are created between residues (-visu), according to probability intervals
-(0-0.25,0.25-0.5,0.5-0.75,0.75-1). Use the run option in pymol to execute the scripts. If you have a single pdb
+Calculate contact probabilities between two chains in a trajectory or a single pdb file. 
+Possible selections of atoms for proteins are calpha, heavy atoms of main chain (heavymc) or side chain (heavysc), or all heavy atoms (heavyall). 
+Possible selections of atoms for nucleic acids are C5' atoms (C5prime), heavy atoms of sugar and phosphate (heavymc) or nucleotide base (heavybase), or all heavy atoms (heavyall). 
+A contact is considered to be formed if at least one heavy atoms between the two chains lies under the specified distance cutoff.
+Pymol scripts can be generated where bonds are created between residues (-visu), according to probability intervals (0-0.25,0.25-0.5,0.5-0.75,0.75-1). Use the run option in pymol to execute the scripts. If you have a single pdb
 file you would like to use for the visualization, you can specify it in the -pdbvisu option, otherwise the 
 script will just create a pdb using the first frame of your trajectory 
 
@@ -21,13 +20,12 @@ To install MDAnalysis, you can use this command
 pip install mdanalysis
 
 ## Description
-
-usage: contacts.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
-                   [-s SELECTION] -co CUTOFF [-o OUTPUT_FILE] [-visu PYMOL]
-                   [-pdbvisu PYMOL_PDB]
-
-
-  -h, --help            show this help message and exit
+usage: contacts-version2.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
+                            [-s1 SELECTION1] [-s2 SELECTION2] -co CUTOFF
+                            [-o OUTPUT_FILE] [-visu PYMOL]
+                            [-pdbvisu PYMOL_PDB]
+                            
+    -h, --help            show this help message and exit
   -p PSF_FILE, --psf PSF_FILE
                         topology file used for simulation (pdb, psf)
   -d DCD_FILE, --dcd DCD_FILE
@@ -37,9 +35,12 @@ usage: contacts.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
   -c2 SEGID2, --chain2 SEGID2
                         segid of second chain for contact calculations
                         (similar as c1 if intrachain contacts needed)
-  -s SELECTION, --selection SELECTION
-                        atom selection calpha or heavy atoms for distance
-                        calculation [calpha/heavy] (default is calphas)
+  -s1 SELECTION1, --selection1 SELECTION1
+                        atom selection for chain 1 (default is all heavy
+                        atoms)
+  -s2 SELECTION2, --selection2 SELECTION2
+                        atom selection for chain 2 (default is all heavy
+                        atoms)
   -co CUTOFF, --cutoff CUTOFF
                         distance cutoff
   -o OUTPUT_FILE, --output OUTPUT_FILE
@@ -47,10 +48,10 @@ usage: contacts.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
   -visu PYMOL, --pymolvisu PYMOL
                         pymol files for visualization [Y/N]
   -pdbvisu PYMOL_PDB, --pymol_pdb PYMOL_PDB
-                        If you want the cool pymol scripts to visualize your
+                        If you want the pymol scripts to visualize your
                         results on the pdb structure, choose a name for a pdb
                         file otherwise it will just create one :-)
-
+                          
 
 * outputs:
 - a contact probability matrix (matrix.csv)
@@ -66,7 +67,6 @@ create pymol visualization scripts and use the file forpymol.pdb for the scripts
 * If you have no psf file you can still use it with the following options and your pdb file instead of the psf
 ./contacts.py -p structurefile.pdb -d twoframes.pdb -c1 A -c2 B -co 3.5 -visu Y -s heavy -pdbvisu forpymol.pdb
  
-
 ## Plotting with the script plot-contacts.py
 If you want to plot the matrix, you can use the script plot-contacts.py (an example of plot is present in the example folder).
 For this the arguments needed are of course the matrix and also the pdb file, the script will extract sequence residue name and number for labelling each axis. You can also transpose the matrix if you prefer it this way (the two possibilities are in the example folder).
@@ -74,9 +74,6 @@ Example:
 Plotting with the transpose option
 ./plot-contacts.py -m matrix.csv -p forpymol.pdb -c1 A -c2 B -d1 4 -d2 4 -t Y
 
-
-## TODO :
-- add options for protein-DNA, DNA-DNA contacts
 
 Enjoy! 
 Contact: yasmine.chebaro@gmail.com
