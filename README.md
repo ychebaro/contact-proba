@@ -20,7 +20,7 @@ To install MDAnalysis, you can use this command
 pip install mdanalysis
 
 ## Description
-usage: contacts-version2.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
+usage: ./contacts.py [-h] -p PSF_FILE -d DCD_FILE -c1 SEGID1 -c2 SEGID2
                             [-s1 SELECTION1] [-s2 SELECTION2] -co CUTOFF
                             [-o OUTPUT_FILE] [-visu PYMOL]
                             [-pdbvisu PYMOL_PDB]
