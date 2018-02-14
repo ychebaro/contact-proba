@@ -14,7 +14,7 @@ import argparse
 import numpy as np
 from math     import sqrt
 
-from MDAnalysis import Universe, collection, Timeseries
+from MDAnalysis import Universe
 from collections import defaultdict
 
 np.set_printoptions(precision=3, threshold=np.nan)
@@ -38,7 +38,7 @@ class GetContacts(object):
     def __init__(self, universe):
         self.u = universe
 
-    def get_protein_coords(self, chainid, selection):
+    def get_protein_coords(self, chainid, selection, nres, res):
         """ Extract protein coordinates
         
         The options available in this case are  
@@ -48,45 +48,41 @@ class GetContacts(object):
         ----------
         - chain id 
         - selection : calpha, heavyall, heavysc, heavymc
+        - number of residues
+        - residue in consideration
         
         Returns
         -------
-        A dictionnary of the coordinate
+        Coordinates of selected atoms
         """
-        # get number of residues 
-        nresch = self.u.select_atoms("segid %s" %(chainid)).n_residues
-        COOR = dict()
-
-        # extract coordinates of appropriate atoms
-        #for ts in self.u.trajectory:
-        for res in range(0,nresch):
-            # All heavy atoms
-            if selection=='heavyall':
-                atprot = self.u.select_atoms("segid %s and resid %d and not name H* " %(chainid, res+1))
-                COOR[res+1] = [atprot.positions]
+        # All heavy atoms
+        if selection=='heavyall':
+                atprot = self.u.select_atoms("segid %s and resid %d and not name H* " %(chainid, nres[res]))
+                coordinates = atprot.positions
                 
-            # Main chain heavy atoms
-            if selection=='heavymc':
-                atprot = self.u.select_atoms("segid %s and resid %d and backbone" %(chainid, res+1))
-                COOR[res+1] = [atprot.positions]
-            
-            # Side chain heavy atoms
-            if selection=='heavysc':
-                atprot = self.u.select_atoms("segid %s and resid %d" %(chainid, res+1))
+        # Main chain heavy atoms
+        if selection=='heavymc':
+                atprot = self.u.select_atoms("segid %s and resid %d and backbone" %(chainid, nres[res]))
+                coordinates = atprot.positions
+
+        # Side chain heavy atoms
+        if selection=='heavysc':
+                atprot = self.u.select_atoms("segid %s and resid %d" %(chainid, nres[res]))
+                coordinates = atprot.positions
                 # Consider only Catoms for GLY residues
                 if atprot.residues.resnames == 'GLY':
-                    COOR[res+1] = [atprot.select_atoms("name CA").positions]
+                    coordinates = atprot.select_atoms("name CA").positions
                 else:
-                    COOR[res+1] = [atprot.select_atoms("not name H* and not backbone").positions]
-            
-            # C alpha atoms
-            if selection=='calpha':
-                atprot = self.u.select_atoms("segid %s and resid %d and name CA" %(chainid, res+1))
-                COOR[res+1] = [atprot.positions]
+                    coordinates = atprot.select_atoms("not name H* and not backbone").positions
+        
+        # C alpha atoms
+        if selection=='calpha':
+                atprot = self.u.select_atoms("segid %s and resid %d and name CA" %(chainid, nres[res]))
+                coordinates = atprot.positions
                     
-        return COOR
+        return coordinates
 
-    def get_nucleic_coords(self, chainid, selection):
+    def get_nucleic_coords(self, chainid, selection, nres, res):
         """ Extract nucleic acid coordinates
         
         The options available in this case are 
@@ -96,39 +92,34 @@ class GetContacts(object):
         ----------
         - chain id
         - selection : C5', heavyall, heavybase, heavymc
+        - number of residues
+        - residue in consideration
         
         Returns
         -------
-        A dictionnary of the coordinates
+        Coordinates of selected atoms
         """
-        # get number of residues 
-        nresch = self.u.select_atoms("segid %s" %(chainid)).n_residues
-        COOR = dict()
-        
-        # extract coordinates of appropriate atoms
-        #for ts in self.u.trajectory:
-        for res in range(0,nresch):
-            # All heavy atoms
-            if selection=='heavyall':
-                atnuc = self.u.select_atoms("segid %s and resid %d and not name H* " %(chainid, res+1))
-                COOR[res+1] = [atnuc.positions]
+        # All heavy atoms
+        if selection=='heavyall':
+                atnuc = self.u.select_atoms("segid %s and resid %d and not name H* " %(chainid, nres[res]))
+                coordinates = atnuc.positions
                     
-            # Main chain (sugar+phosphate) heavy atoms
-            if selection=='heavymc':
-                atnuc = self.u.select_atoms("segid %s and resid %d and (nucleicsugar or nucleicbackbone or (name O1P or name O2P or name OP1 or name OP2))" %(chainid, res+1))
-                COOR[res+1] = [atnuc.positions]
+        # Main chain (sugar+phosphate) heavy atoms
+        if selection=='heavymc':
+                atnuc = self.u.select_atoms("segid %s and resid %d and (nucleicsugar or nucleicbackbone or (name O1P or name O2P or name OP1 or name OP2))" %(chainid, nres[res]))
+                coordinates = atnuc.positions
             
-            # Nucleic base
-            if selection=='heavybase':
-                atnuc = self.u.select_atoms("segid %s and resid %d and nucleicbase" %(chainid, res+1))
-                COOR[res+1] = [atnuc.positions]
+        # Nucleic base
+        if selection=='heavybase':
+                atnuc = self.u.select_atoms("segid %s and resid %d and nucleicbase" %(chainid, nres[res]))
+                coordinates = atnuc.positions
 
-            # C5' atoms
-            if selection=='C5prime':
-                atnuc = self.u.select_atoms("segid %s and resid %d and name C5'" %(chainid, res+1))
-                COOR[res+1] = [atnuc.positions]
+        # C5' atoms
+        if selection=='C5prime':
+                atnuc = self.u.select_atoms("segid %s and resid %d and name C5'" %(chainid, nres[res]))
+                coordinates = atnuc.positions
 
-        return COOR
+        return coordinates
 
     def assign_biomolecule(self, chainid):
         """ Determine if chain is protein or nucleic
@@ -141,6 +132,7 @@ class GetContacts(object):
         -------
         Protein or Nucleic
         """
+        nresids = 0
         chainprot = self.u.select_atoms("segid %s and protein" %(chainid))
         chainnuc = self.u.select_atoms("segid %s and nucleic" %(chainid))
         if chainnuc.n_residues != 0:
@@ -155,6 +147,17 @@ class GetContacts(object):
         """ Calculate distance between two positions defined by 3D coordinates """
         dist = round(sqrt(pow(v1[0]-v2[0],2)+pow(v1[1]-v2[1],2)+pow(v1[2]-v2[2],2)),3)
         return dist
+    
+    def get_list_residues(self, chain, bio):
+        """ Get list with number of residues """
+        if bio == "protein":
+            ca_resids = self.u.select_atoms("segid %s and name CA" %(chain))
+            nres = ca_resids.resids
+        if bio == "nucleic":
+            c5_resids = self.u.select_atoms("segid %s and name C5'" %(chain))
+            nres = c5_resids.resids
+            
+        return nres
     
     def run(self, chain1, chain2, selection1, selection2, cutoff):
         """ Run the contact calculation between chains
@@ -173,18 +176,26 @@ class GetContacts(object):
         """
         bio1, nresids1 = self.assign_biomolecule(chain1)
         bio2, nresids2 = self.assign_biomolecule(chain2)
+        nres1 = self.get_list_residues(chain1,bio1)
+        nres2 = self.get_list_residues(chain2,bio2)
+        COOR1 = dict()
+        COOR2 = dict()
         
         contactmat = np.zeros((nresids1, nresids2))
+        
         for ts in self.u.trajectory:
-            # find more elegant way to do this when I have time...
-            if bio1 == "protein":
-                COOR1 = self.get_protein_coords(chain1, selection1)
-            if bio2 == "protein":
-                COOR2 = self.get_protein_coords(chain2, selection1)
-            if bio1 == "nucleic":
-                COOR1 = self.get_nucleic_coords(chain1, selection1)
-            if bio2 == "nucleic":
-                COOR2 = self.get_nucleic_coords(chain2, selection2)         
+            for res in range(len(nres1)):
+                # find more elegant way to do this when I have time...
+                if bio1 == "protein":
+                    COOR1[res+1] = [self.get_protein_coords(chain1, selection1, nres1, res)]
+                if bio1 == "nucleic":
+                    COOR1[res+1] = [self.get_nucleic_coords(chain1, selection1, nres1, res)]
+            for res in range(len(nres2)):                
+                if bio2 == "protein":
+                    COOR2[res+1] = [self.get_protein_coords(chain2, selection2, nres2, res)]
+                if bio2 == "nucleic":
+                    COOR2[res+1] = [self.get_nucleic_coords(chain2, selection2, nres2, res)]         
+                    
             for key1, value1 in COOR1.iteritems():
                 for key2, value2 in COOR2.iteritems():
                     find = False
@@ -192,13 +203,13 @@ class GetContacts(object):
                         for j in range(len(value2[0])):
                             dist = self.calc_dist(value1[0][i],value2[0][j])
                             if dist <= float(cutoff):
-                                print key1, key2, dist
                                 contactmat[key1-1, key2-1] += 1
                                 find = True
                                 if find:
                                     break
                         if find:
                             break
+                        
         return contactmat/len(self.u.trajectory), bio1, bio2
     
 
