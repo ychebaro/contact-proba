@@ -240,17 +240,15 @@ def pymol_contact_visu(contactprob,pymol_pdb,chain1,chain2,bio1,bio2):
 
     # next check if the residue number does not start with 1, if not get the shift for each chain, 
     # this is needed for the pymol scripts, so that the row and column elements match properly the residue numbers in the pdb
+    shift1 = 0
+    shift2 = 0
     with open(pymol_pdb) as myFile:
-          lines = myFile.readlines()
-          if int(lines[lookup1[0]][23:26]) != 1:
-                 shift1 = int(lines[lookup1[0]][23:26])-2
-          if int(lines[lookup2[0]][23:26]) != 1:
-                 shift2 = int(lines[lookup2[0]][23:26])-2
-          else:
-                 shift1 = 0    
-                 shift2 = 0    
+        lines = myFile.readlines()
+        if int(lines[lookup1[0]][23:26]) != 1:
+            shift1 = int(lines[lookup1[0]][23:26])-2
+        if int(lines[lookup2[0]][23:26]) != 1:
+            shift2 = int(lines[lookup2[0]][23:26])-2
     myFile.close()
-     
     
     file_list = ["prob-0-0.25.pml","prob-0.25-0.5.pml","prob-0.5-0.75.pml","prob-0.75-1.0.pml"]
     file_handles = []
@@ -264,7 +262,6 @@ def pymol_contact_visu(contactprob,pymol_pdb,chain1,chain2,bio1,bio2):
           fh.write("load %s, pdbin\n" %pymol_pdb)
           fh.write("hide everything, /pdbin \n")
           fh.write("\n")
-
       
       # append in each file the residue numbers for contacts in each probability interval
       # bond the pairwise residues and color the bonds according to probability (blue to red)
