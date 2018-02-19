@@ -11,7 +11,7 @@ import argparse
 
 def getlastresidnumber(filein, chainid, ext):
     with open(filein) as myFile:
-        # first line is skipped to avoid problems extract residue number 
+        # first line is skipped to avoid problems extracting residue number 
         lines = myFile.readlines()[1:]
         for line in lines:
             if ext == "ext" and line[11:12] == chainid:
@@ -21,8 +21,25 @@ def getlastresidnumber(filein, chainid, ext):
             if ext == "pdb" and line[21:22] == chainid and line[0:4] == 'ATOM':
                 last_resid = int(line[22:26])
         return last_resid
+    
+def getfirstresidnumber(filein, chainid, ext):
+    with open(filein) as myFile:
+        # first line is skipped to avoid problems extracting residue number 
+        lines = myFile.readlines()[1:]
+        for line in lines:
+            if ext == "ext" and line[11:12] == chainid:
+                first_resid = int(line[20:25])
+                break
+            if ext == "psf" and line[9:10] == chainid:
+                first_resid = int(line[14:19])
+                break
+            if ext == "pdb" and line[21:22] == chainid and line[0:4] == 'ATOM':
+                first_resid = int(line[22:26])
+                break
+        return first_resid
+
                     
-def writenewfile(filein, chain_k, chain_r, lastresid, ext, fileoutname):
+def writenewfile(filein, chain_k, chain_r, lastresid, firstresid, ext, fileoutname):
     fileout = open(fileoutname,'w')
     with open(filein) as myFile:
         lines = myFile.readlines()
@@ -41,8 +58,14 @@ def writenewfile(filein, chain_k, chain_r, lastresid, ext, fileoutname):
                     fileout.write('%s' %line)
             if ext == "pdb":
                 if line[21:22] == chain_r:
-                    space = len(line[22:26]) - len(str(int(line[22:27])+lastresid))
-                    fileout.write('%s %s%s%s%s%s%s' %(str(line[0:20]), chain_k, space*str(' '), str(int(line[22:27])+lastresid), line[26:72], chain_k, line[73:]))
+                    if firstresid == 1:
+                        space = len(line[22:26]) - len(str(int(line[22:27])+lastresid))
+                        fileout.write('%s %s%s%s%s%s%s' %(str(line[0:20]), chain_k, space*str(' '), str(int(line[22:27])+lastresid), line[26:72], chain_k, line[73:]))
+                    elif firstresid != 1:
+                        space = len(line[22:26]) - len(str(int(line[22:27])-firstresid+lastresid+1))
+                        #print space
+                        fileout.write('%s %s%s%s%s%s%s' %(str(line[0:20]), chain_k, space*str(' '), str(int(line[22:27])-firstresid+lastresid+1), line[26:72], chain_k, line[73:]))
+                  
                 else:
                     fileout.write('%s' %line)
     return
@@ -79,7 +102,8 @@ def main():
     
     # first get last residue of the chain to keep
     lastresid = getlastresidnumber(inputfile, chain2, ext)
-    writenewfile(inputfile, chain2, chain1, lastresid, ext, output)
+    firstresid = getfirstresidnumber(inputfile, chain1, ext)
+    writenewfile(inputfile, chain2, chain1, lastresid, firstresid, ext, output)
 
 if __name__ == "__main__":
     main()
