@@ -9,6 +9,7 @@ Pymol scripts can be generated where bonds are created between residues (-visu),
 file you would like to use for the visualization, you can specify it in the -pdbvisu option, otherwise the 
 script will just create a pdb using the first frame of your trajectory 
 
+Note: residue numbering should be continuous
 
 ## Prerequisites
 You need :
@@ -83,6 +84,8 @@ Plotting with the transpose option
 If you need to change the name of a chain to another (for instance for making all protein chains into one chain id, if you need to calculate protein dna contacts this could be useful), use the script renumber.psf.
 
 
+# TODO :
+be able to use pdbs with missing residues...
 
 Enjoy! 
 Contact: yasmine.chebaro@gmail.com
