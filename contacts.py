@@ -219,7 +219,7 @@ def search_for_string(filein,lookup):
     list_starts = []
     with open(filein) as myFile:
         for num, line in enumerate(myFile, 1):
-            if lookup in line and line[0:4] == 'ATOM' :
+            if lookup in line[20:23] and line[0:4] == 'ATOM' :
                 list_starts.append(int(num))
 
     return list_starts
@@ -245,9 +245,9 @@ def pymol_contact_visu(contactprob,pymol_pdb,chain1,chain2,bio1,bio2):
     with open(pymol_pdb) as myFile:
         lines = myFile.readlines()
         if int(lines[lookup1[0]][23:26]) != 1:
-            shift1 = int(lines[lookup1[0]][23:26])-2
+            shift1 = int(lines[lookup1[0]][23:26])-1
         if int(lines[lookup2[0]][23:26]) != 1:
-            shift2 = int(lines[lookup2[0]][23:26])-2
+            shift2 = int(lines[lookup2[0]][23:26])-1
     myFile.close()
     
     file_list = ["prob-0-0.25.pml","prob-0.25-0.5.pml","prob-0.5-0.75.pml","prob-0.75-1.0.pml"]
