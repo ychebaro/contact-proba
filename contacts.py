@@ -4,7 +4,7 @@
 
 """ Contact probabilities """
 
-# comment: maybe did not need an object for this, but it was for getting familiar with OO
+# comment: need to add something for protein-ligand contacts
 
 
 import subprocess
